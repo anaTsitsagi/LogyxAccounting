@@ -23,12 +23,5 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapDefaultControllerRoute();
 app.MapRazorPages();
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(
-    Path.Combine(app.Environment.ContentRootPath, "node_modules")
-  ),
-    RequestPath = "/node_modules"
-});
 
 app.Run();

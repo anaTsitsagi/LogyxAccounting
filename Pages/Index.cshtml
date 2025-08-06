@@ -1,15 +1,20 @@
 @page
 @using LogyxAccounting.Models
 @using DevExpress.Spreadsheet
-
+@using System.IO
 @inject IWebHostEnvironment env
-<head>
-    <script src="~/node_modules/devextreme-dist/js/dx.all.js"></script>
-    <link href="~/node_modules/devextreme-dist/css/dx.light.css" rel="stylesheet" />
 
-    <!-- Spreadsheet extension -->
-    <script src="~/node_modules/devexpress-aspnetcore-spreadsheet/dist/dx-aspnetcore-spreadsheet.js"></script>
-    <link href="~/node_modules/devexpress-aspnetcore-spreadsheet/dist/dx-aspnetcore-spreadsheet.css" rel="stylesheet" />
+@{
+    var filePath = System.IO.Path.Combine(
+       env.WebRootPath,
+       "Documents", "sample.xlsx");
+}
+
+<head>
+    <link href="~/lib/devextreme-dist/css/dx.light.css" rel="stylesheet" />
+    <link href="~/lib/dx-aspnetcore-spreadsheet.css" rel="stylesheet" />
+    <script src="~/lib/devextreme-dist/js/dx.all.js"></script>
+    <script src="~/lib/dx-aspnetcore-spreadsheet.js"></script>
 </head>
 
 
@@ -17,6 +22,6 @@
     .Spreadsheet("spreadsheet")
     .Height("500px")
     .Width("100%")
-    .Open("Documents/sample.xlsx")
+    .Open(filePath)
     .DocumentRequestHandlerUrl(Url.Action("DxDocumentRequest", "SpreadSheet"))
 )
