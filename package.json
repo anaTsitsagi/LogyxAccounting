@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean:dx": "rimraf wwwroot/lib/devextreme wwwroot/lib/jquery",
+    "copy:dx": "cpx \"node_modules/devextreme-dist/css/dx.fluent.blue.compact.css\" wwwroot/lib/devextreme/css && cpx \"node_modules/devextreme-dist/css/dx.spreadsheet.css\" wwwroot/lib/devextreme/css && cpx \"node_modules/devextreme-dist/js/dx.all.js\" wwwroot/lib/devextreme/js && cpx -C \"node_modules/devextreme-dist/fonts/**/*\" wwwroot/lib/devextreme/fonts && cpx -C \"node_modules/devextreme-dist/css/icons/**/*\" wwwroot/lib/devextreme/css/icons && cpx \"node_modules/devexpress-aspnetcore-spreadsheet/dist/dx-aspnetcore-spreadsheet.js\" wwwroot/lib/devextreme/js && cpx \"node_modules/jquery/dist/jquery.min.js\" wwwroot/lib/jquery",
+    "postinstall": "npm run clean:dx && npm run copy:dx"
   },
   "keywords": [],
   "author": "",

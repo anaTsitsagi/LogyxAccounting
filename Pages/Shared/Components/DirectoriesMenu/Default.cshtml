@@ -1,0 +1,33 @@
+﻿@using DevExtreme.AspNet.Mvc
+@using LogyxAccounting.Controllers
+
+@{
+    var items = (DirectoriesMenuViewComponent.Item[])ViewData["Items"];
+    var activeKey = ((string)ViewData["ActiveKey"] ?? "").ToLower();
+}
+
+@(Html.DevExtreme().Toolbar()
+    .ElementAttr("class", "custom-toolbar")
+    .Items(i =>
+    {
+        i.Add().Widget(w => w.Menu()
+            .ID("topMenu")
+            .Orientation(Orientation.Horizontal)
+            .SelectionMode(MenuSelectionMode.Single)   // <- 1) enable selection
+            .SelectByClick(true)
+            .SelectedExpr("selected")                   // <- 2) we’ll flag the item
+            .Items(m =>
+            {
+                foreach (var it in items)
+                {
+                    var isSelected = string.Equals(it.Key, activeKey, System.StringComparison.OrdinalIgnoreCase);
+
+                    m.Add().Text(it.Text)
+                         .Url(Url.Action(it.Action, it.Controller))
+                         .Option("key", it.Key)
+                         .Option("selected", isSelected);   // <- mark the active item
+                }
+            })
+        ).Location(ToolbarItemLocation.After);
+    })
+)

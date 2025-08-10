@@ -1,0 +1,139 @@
+﻿@page
+@using LogyxAccounting.Models
+@using LogyxAccounting.Models.Repository
+
+<div class="widget-container">
+
+    @* Reusable top menu inside page content *@
+    @await Component.InvokeAsync("DirectoriesMenu", new { activeKey = "products" })
+
+    @(Html.DevExtreme().DataGrid<ProductsRepository>()
+        .ID("productsGrid")
+        .ElementAttr(new { @class = "dx-card wide-card custom-grid grid-card" })
+
+        // Data
+        .DataSource(d => d.Mvc()
+        .Controller("Products")
+        .LoadAction("Get")
+        .Key("id")
+        )
+
+        // Look & feel
+        .ShowBorders(false)
+        .RowAlternationEnabled(true)
+        .HoverStateEnabled(true)
+        .ColumnAutoWidth(true)
+        .AllowColumnReordering(true)
+        .AllowColumnResizing(true)
+        .ColumnResizingMode(ColumnResizingMode.NextColumn)
+
+        // Find & filter
+        .SearchPanel(s => s.Visible(true).Placeholder("ძებნა..."))
+        .FilterRow(f => f.Visible(true).ApplyFilter(GridApplyFilterMode.Auto))
+        .HeaderFilter(h => h.Visible(false))
+
+        //editing
+        .Editing(editing =>
+        {
+            editing.Mode(GridEditMode.Row);
+            editing.AllowAdding(true);
+            editing.AllowDeleting(true);
+            editing.AllowUpdating(true);
+        })
+
+        // Columns
+        .Columns(columns =>
+        {
+            columns.AddFor(m => m.name)
+            .Caption("დასახელება")
+            .ValidationRules(v => v.AddRequired().Message("საჭიროა დასახელება"));
+
+            columns.AddFor(m => m.code)
+            .Caption("კოდი")
+            .Width(140);
+
+            columns.AddFor(m => m.barcode)
+            .Caption("შტრიხკოდი")
+            .Width(160);
+
+            columns.AddFor(m => m.price)
+            .Caption("ფასი")
+            .DataType(GridColumnDataType.Number)
+            .Format(f => f.Type(Format.FixedPoint).Precision(2))
+            .EditorOptions(new { min = 0 });
+
+            columns.AddFor(m => m.sale_percent)
+            .Caption("ფასდაკლება")
+            .DataType(GridColumnDataType.Number)
+            .CustomizeText("function(e){ return (e.value ?? 0) + '%'; }");
+
+        })
+
+        // Sorting/selection
+        .Sorting(s => s.Mode(GridSortingMode.Multiple))
+        .Selection(sel => sel.Mode(SelectionMode.Single))
+
+        // Column chooser
+        .ColumnChooser(cc => cc.Enabled(true).Mode(GridColumnChooserMode.Select))
+
+        // Totals
+        .Summary(s => s.TotalItems(t =>
+        {
+            t.Add().SummaryType(SummaryType.Count)
+            .DisplayFormat("ჩანაწერები: {0}");
+
+            t.Add().Column("price")
+            .SummaryType(SummaryType.Sum)
+            .ValueFormat(v => v.Type(Format.FixedPoint).Precision(2))
+            .DisplayFormat("ჯამი: {0}");
+        }))
+
+        // Paging
+        .Paging(p => p.PageSize(10))
+        .Pager(p => p
+        .ShowPageSizeSelector(true)
+        .AllowedPageSizes(new[] { 10, 20, 50 })
+        .ShowInfo(true))
+
+        // Remember user layout (order/widths etc.)
+        .StateStoring(ss => ss.Enabled(true)
+        .Type(StateStoringType.LocalStorage)
+        .StorageKey("productsGridState"))
+
+        // Custom toolbar buttons
+        .OnToolbarPreparing("products_onToolbarPreparing")
+
+        )
+</div>
+
+
+    <script>
+        function products_onToolbarPreparing(e) {
+            const grid = e.component;
+
+
+            // Right side: Refresh
+
+            e.toolbarOptions.items.push({
+                location: "after",
+                widget: "dxButton",
+                options: { icon: "refresh", hint: "განახლება", onClick: () => grid.refresh() }
+            });
+
+            // Right side: Reset layout (clears state storing)
+            e.toolbarOptions.items.push({
+                location: "after",
+                widget: "dxButton",
+                options: {
+                    icon: "revert",
+                    hint: "გადაყენება (განლაგება)",
+                    onClick: () => {
+                        try { localStorage.removeItem("productsGridState"); } catch (e) { }
+                        grid.state(null);
+                        grid.refresh();
+                    }
+                }
+            });
+        }
+    </script>
+

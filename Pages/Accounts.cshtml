@@ -1,0 +1,74 @@
+﻿@page
+@using LogyxAccounting.Models
+@using LogyxAccounting.Models.Repository
+
+
+<div class="widget-container">
+    @await Component.InvokeAsync("DirectoriesMenu", new { activeKey = "accounts" })
+
+    @(Html.DevExtreme().DataGrid<AccountsRepository>()
+        .ElementAttr(new { @class = "dx-card wide-card" })
+        .DataSource(d => d.Mvc().Controller("Accounts").LoadAction("Get").Key("id"))
+        .ShowBorders(false)
+        .FilterRow(f => f.Visible(true))
+        .FocusedRowEnabled(true)
+        .FocusedRowIndex(0)
+        .ColumnAutoWidth(true)
+        .Columns(columns =>
+        {
+            columns.AddFor(m => m.code);
+            columns.AddFor(m => m.name);
+        })
+        .Paging(p => p.PageSize(10))
+        .Pager(p => p
+        .ShowPageSizeSelector(true)
+        .AllowedPageSizes(new[] { 5, 10, 20 })
+        .ShowInfo(true)
+        )
+        )
+</div>
+
+<script>
+    function orientation_valueChanged(e) {
+        const $widgetWrapper = $(".widget-wrapper");
+
+        const isVertical = e.value === "vertical";
+
+        $widgetWrapper.toggleClass("widget-wrapper-vertical", isVertical);
+        $widgetWrapper.toggleClass("widget-wrapper-horizontal", !isVertical);
+
+        setTabsOption("orientation", e.value);
+    }
+
+    function stylingMode_valueChanged(e) {
+        setTabsOption("stylingMode", e.value);
+    }
+
+    function iconPosition_valueChanged(e) {
+        setTabsOption("iconPosition", e.value);
+    }
+
+    function showNavigation_valueChanged(e) {
+        const scrollContentCheckBox = $("#scroll-content").dxCheckBox("instance");
+        const shouldRestrictWidth = data.value || scrollContentCheckBox.option("value");
+
+        toggleStrictWidthClass(shouldRestrictWidth);
+
+        setTabsOption("showNavButtons", e.value);
+    }
+
+    function scrollContent_valueChanged(e) {
+        const showNavButtonsCheckBox = $("#show-navigation-buttons").dxCheckBox("instance");
+        const shouldRestrictWidth = data.value || showNavButtonsCheckBox.option("value");
+
+        toggleStrictWidthClass(shouldRestrictWidth);
+
+        setTabsOption("scrollByContent", e.value);
+    }
+
+    function toggleStrictWidthClass(shouldRestrictWidth) {
+        const $widgetWrapper = $(".widget-wrapper");
+
+        $widgetWrapper.toggleClass("strict-width", isHorizontal && shouldRestrictWidth);
+    }
+</script>

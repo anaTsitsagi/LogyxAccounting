@@ -6,7 +6,7 @@ body, html {
 
 #app-side-nav-outer-toolbar {
     flex-direction: column;
-    display: flex; 
+    display: flex;
     height: 100%;
     width: 100%;
 }
@@ -32,23 +32,23 @@ body, html {
     margin: 2px 2px 3px;
 }
 
-.dx-card.wide-card {
-    border-radius: 0;
-    margin-left: 0;
-    margin-right: 0;
-    border-right: 0;
-    border-left: 0;
-}
+    .dx-card.wide-card {
+        border-radius: 0;
+        margin-left: 0;
+        margin-right: 0;
+        border-right: 0;
+        border-left: 0;
+    }
 
 .with-footer > .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content {
     height: 100%;
 }
 
-.with-footer > .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content > .dx-scrollview-content {
-    display: flex;
-    flex-direction: column;
-    min-height: 100%;
-}
+    .with-footer > .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content > .dx-scrollview-content {
+        display: flex;
+        flex-direction: column;
+        min-height: 100%;
+    }
 
 .layout-body {
     background-color: #fff;
@@ -57,18 +57,19 @@ body, html {
     min-height: 0;
 }
 
-.layout-body .menu-container {
-    height: 100%;
-    width: 250px;
-    background-color: #fff;
-}
+    .layout-body .menu-container {
+        height: 100%;
+        width: 250px;
+        background-color: #fff;
+    }
 
-.layout-body  {
+.layout-body {
     flex-grow: 1;
     height: 100%;
     line-height: 1.5;
     margin: 0px 0px;
 }
+
 .content {
     flex-grow: 1;
     height: 100%;
@@ -129,37 +130,213 @@ body, html {
     white-space: nowrap;
 }
 
-.menu-container .dx-treeview .dx-treeview-item {
-    padding-left: 0;
-    flex-direction: row-reverse;
-    border-radius: 0;
+    .menu-container .dx-treeview .dx-treeview-item {
+        padding-left: 0;
+        flex-direction: row-reverse;
+        border-radius: 0;
+    }
+
+        .menu-container .dx-treeview .dx-treeview-item .dx-icon {
+            width: 60px !important;
+            margin: 0 !important;
+        }
+
+    .menu-container .dx-treeview .dx-treeview-node {
+        padding: 0 0 !important;
+    }
+
+    .menu-container .dx-treeview .dx-treeview-toggle-item-visibility {
+        right: 10px;
+        left: auto;
+    }
+
+    .menu-container .dx-treeview .dx-rtl .dx-treeview-toggle-item-visibility {
+        left: 10px;
+        right: auto;
+    }
+
+    .menu-container .dx-treeview .dx-treeview-node[aria-level="1"] {
+        font-weight: bold;
+    }
+
+    .menu-container .dx-treeview .dx-treeview-node[aria-level="2"] .dx-treeview-item-content {
+        font-weight: normal;
+        padding: 0 40px;
+    }
+
+/* Toolbar container */
+.custom-toolbar {
+    background: #fff;
+    border-bottom: 1px solid #e6e8eb; /* OPTIONAL: remove this if you want only the blue underline */
 }
 
-.menu-container .dx-treeview .dx-treeview-item .dx-icon {
-    width: 60px !important;
-    margin: 0 !important;
+    /* Compact height */
+    .custom-toolbar .dx-toolbar-items-container {
+        min-height: 32px;
+        height: 42px;
+        padding: 0 0;
+    }
+
+    /* Base menu look */
+    .custom-toolbar .dx-menu {
+        background: transparent;
+        border: 0;
+    }
+
+        .custom-toolbar .dx-menu .dx-menu-item {
+            margin: 0 6px;
+        }
+
+        .custom-toolbar .dx-menu .dx-menu-item-content {
+            position: relative;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 13px 12px 9px 12px;
+            color: #222;
+            background: transparent !important; 
+        }
+
+    /* Remove link underline, keep color */
+    .custom-toolbar .dx-menu-item-content a {
+        text-decoration: none !important;
+        color: inherit;
+    }
+
+    /* No background on hover/selected */
+    .custom-toolbar .dx-menu .dx-menu-item.dx-state-hover,
+    .custom-toolbar .dx-menu .dx-menu-item.dx-state-selected {
+        background: transparent !important;
+    }
+
+        /* Blue underline ONLY on hover/selected — flush with bottom, thinner */
+        .custom-toolbar .dx-menu .dx-menu-item.dx-state-hover .dx-menu-item-content::after,
+        .custom-toolbar .dx-menu .dx-menu-item.dx-state-selected > .dx-menu-item-content::after {
+            content: "";
+            position: absolute;
+            left: 0; /* set to 5px if you want inset edges */
+            right: 0; /* set to 5px if you want inset edges */
+            bottom: 0; /* flush with the bottom edge */
+            height: 2px; /* thinner line (use 1px if you want super thin) */
+            background: #1e66ff;
+            border-radius: 0;
+        }
+
+    /* Kill any default separators DevExtreme may add */
+    .custom-toolbar .dx-menu-base,
+    .custom-toolbar .dx-menu-horizontal .dx-menu-item-wrapper {
+        border: none !important;
+    }
+
+/* ========= App-wide compact DevExtreme DataGrid theme ========= */
+/* Scope all tweaks under .custom-grid so nothing else is affected */
+
+.custom-grid .dx-datagrid {
+    font-size: 12px;
+}
+/* ~2px smaller */
+
+/* Header cells, data rows, and group rows */
+.custom-grid .dx-datagrid-headers .dx-header-row > td,
+.custom-grid .dx-datagrid-rowsview .dx-data-row > td,
+.custom-grid .dx-datagrid-rowsview .dx-group-row > td {
+    padding: 8px 8px; /* tighter cells */
 }
 
-.menu-container .dx-treeview .dx-treeview-node {
-    padding: 0 0 !important;
+.custom-grid .dx-datagrid-rowsview .dx-row {
+    line-height: 1.45;
 }
 
-.menu-container .dx-treeview .dx-treeview-toggle-item-visibility {
-    right: 10px;
-    left: auto;
+/* ===== Header toolbar (top bar with buttons & search) ===== */
+.custom-grid .dx-datagrid-header-panel .dx-toolbar,
+.custom-grid .dx-datagrid-header-panel .dx-toolbar .dx-toolbar-items-container {
+    min-height: 30px !important;
+    height: 30px !important;
 }
 
-.menu-container .dx-treeview .dx-rtl .dx-treeview-toggle-item-visibility {
-    left: 10px;
-    right: auto;
+    .custom-grid .dx-datagrid-header-panel .dx-toolbar .dx-button .dx-button-content {
+        padding: 2px 6px; /* smaller icon buttons */
+    }
+
+    .custom-grid .dx-datagrid-header-panel .dx-toolbar .dx-toolbar-after {
+        gap: 6px; /* tighter spacing */
+    }
+
+/* ===== Global search box (top-right) ===== */
+.custom-grid .dx-datagrid-search-panel {
+    margin: 0 6px 0 0;
 }
 
-.menu-container .dx-treeview .dx-treeview-node[aria-level="1"] {
-    font-weight: bold;
+    .custom-grid .dx-datagrid-search-panel .dx-texteditor-input {
+        font-size: 12px;
+        height: 28px;
+        line-height: 22px;
+        padding: 2px 8px;
+    }
+
+    .custom-grid .dx-datagrid-search-panel .dx-texteditor-input-container {
+        height: 28px !important;
+    }
+
+    .custom-grid .dx-datagrid-search-panel .dx-texteditor-buttons-container .dx-button {
+        height: 28px;
+    }
+
+/* ===== Filter row editors (under each column header) ===== */
+.custom-grid .dx-datagrid .dx-filter-row .dx-editor-underlined .dx-texteditor-input {
+    font-size: 12px;
+    height: 22px;
+    line-height: 20px;
+    padding-top: 1px;
+    padding-bottom: 1px;
 }
 
-.menu-container .dx-treeview .dx-treeview-node[aria-level="2"] .dx-treeview-item-content {
-    font-weight: normal;
-    padding: 0 40px;
+.custom-grid .dx-datagrid .dx-filter-row .dx-editor-underlined .dx-texteditor-input-container {
+    height: 22px !important;
+}
+    /* thinner underline (Fluent theme) */
+    .custom-grid .dx-datagrid .dx-filter-row .dx-editor-underlined .dx-texteditor-input-container:before,
+    .custom-grid .dx-datagrid .dx-filter-row .dx-editor-underlined.dx-state-focused .dx-texteditor-input-container:after {
+        height: 1px !important;
+    }
+
+/* ===== Pager compact ===== */
+.custom-grid .dx-pager .dx-page,
+.custom-grid .dx-pager .dx-page-sizes .dx-page-size {
+    font-size: 12px;
+    padding: 2px 6px;
 }
 
+.custom-grid .dx-pager .dx-info {
+    font-size: 12px;
+}
+
+/* ===== Total footer compact ===== */
+.custom-grid .dx-datagrid-total-footer .dx-row > td {
+    padding: 6px 8px;
+}
+
+.custom-grid .dx-datagrid-total-footer .dx-datagrid-summary-item {
+    font-size: 12px;
+}
+
+/* Sleek edge around every grid that has grid-card */
+.custom-grid .grid-card {
+    margin: 18px 12px 18px; /* the subtle outer edge */
+    border-radius: 12px;
+    overflow: hidden; /* rounds the grid corners cleanly */
+    background: #fff;
+    border: 1px solid #e9ecef; /* hairline border */
+    box-shadow: 0 8px 20px rgba(0,0,0,.05); /* soft depth */
+}
+
+    /* Keep grid corners consistent inside the card */
+    .custom-grid .grid-card .dx-datagrid,
+    .custom-grid .grid-card .dx-datagrid-headers,
+    .custom-grid .grid-card .dx-datagrid-rowsview,
+    .custom-grid .grid-card .dx-datagrid-total-footer {
+        border-radius: 10px;
+    }
+
+.custom-grid .dx-datagrid-headers .dx-header-row > td:not(.dx-command-select):not(.dx-command-edit):not(.dx-command-adaptive):not(.dx-command-expand):not(.dx-command-drag) {
+    text-align: center;
+}

@@ -4,24 +4,17 @@
 @using System.IO
 @inject IWebHostEnvironment env
 
-@{
-    var filePath = System.IO.Path.Combine(
-       env.WebRootPath,
-       "Documents", "sample.xlsx");
-}
+
 
 <head>
-    <link href="~/lib/devextreme-dist/css/dx.light.css" rel="stylesheet" />
+    <link href="~/css/devextreme/theme.base.css" rel="stylesheet" />
+  @*   <link href="~/lib/dx.light.css" rel="stylesheet" /> *@
     <link href="~/lib/dx-aspnetcore-spreadsheet.css" rel="stylesheet" />
-    <script src="~/lib/devextreme-dist/js/dx.all.js"></script>
-    <script src="~/lib/dx-aspnetcore-spreadsheet.js"></script>
+    <script src="~/lib/devextreme/js/dx.all.js"></script>
+    <script src="~/lib/devextreme/js/dx-aspnetcore-spreadsheet.js"></script>
 </head>
 
 
-@(Html.DevExpress()
-    .Spreadsheet("spreadsheet")
-    .Height("500px")
-    .Width("100%")
-    .Open(filePath)
-    .DocumentRequestHandlerUrl(Url.Action("DxDocumentRequest", "SpreadSheet"))
-)
+<body>
+    Hello my 
+</body>
