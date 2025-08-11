@@ -337,6 +337,25 @@ body, html {
         border-radius: 10px;
     }
 
+/* Center column headers (titles) */
 .custom-grid .dx-datagrid-headers .dx-header-row > td:not(.dx-command-select):not(.dx-command-edit):not(.dx-command-adaptive):not(.dx-command-expand):not(.dx-command-drag) {
-    text-align: center;
+    text-align: center !important;
+}
+/* make sure the internal wrapper doesn’t fight it */
+.custom-grid .dx-datagrid-headers .dx-header-row .dx-datagrid-text-content {
+    float: none;
+    display: inline-block;
+}
+/* Bigger indent per level for this TreeList */
+.tree-indent-lg .dx-treelist-rowsview .dx-treelist-empty-space,
+.tree-indent-lg .dx-treelist-headers .dx-treelist-empty-space {
+    width: 36px !important; /* try 28–36px */
+    min-width: 36px !important;
+    display: inline-block; /* ensure it takes space */
+}
+
+.tree-indent-lg .dx-treelist-rowsview .dx-treelist-icon-container,
+.tree-indent-lg .dx-treelist-headers .dx-treelist-icon-container {
+    width: 36px !important; /* keep the icon block in sync */
+    min-width: 36px !important;
 }

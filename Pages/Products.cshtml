@@ -15,6 +15,9 @@
         .DataSource(d => d.Mvc()
         .Controller("Products")
         .LoadAction("Get")
+        .InsertAction("Post")
+        .UpdateAction("Put")
+        .DeleteAction("Delete")
         .Key("id")
         )
 
@@ -26,6 +29,7 @@
         .AllowColumnReordering(true)
         .AllowColumnResizing(true)
         .ColumnResizingMode(ColumnResizingMode.NextColumn)
+        .WordWrapEnabled(true)
 
         // Find & filter
         .SearchPanel(s => s.Visible(true).Placeholder("ძებნა..."))
@@ -33,13 +37,78 @@
         .HeaderFilter(h => h.Visible(false))
 
         //editing
-        .Editing(editing =>
+        .Editing(e => e
+        .Mode(GridEditMode.Form)
+        .AllowAdding(true)
+        .AllowUpdating(true)
+        .AllowDeleting(true)
+        .UseIcons(true)
+        .Form(f => f
+        .ColCount(2)
+        .LabelLocation(FormLabelLocation.Top)
+        .Items(items =>
         {
-            editing.Mode(GridEditMode.Row);
-            editing.AllowAdding(true);
-            editing.AllowDeleting(true);
-            editing.AllowUpdating(true);
+
+            items.AddSimpleFor(m => m.name)
+            .IsRequired(true)
+            .ValidationRules(v => v.AddRequired().Message("აუცილებელია!"));
+
+            items.AddSimpleFor(m => m.code);
+
+            items.AddSimpleFor(m => m.barcode);
+
+            items.AddSimpleFor(m => m.price)
+            .Editor(ed => ed.NumberBox()
+            .ShowSpinButtons(true)
+            .Min(0)
+            .Format(fm => fm.Type(Format.FixedPoint).Precision(2)));
+
+                // DB stores 20 for 20% → keep 0..100 editor
+            items.AddSimpleFor(m => m.sale_percent);
+
+            items.AddSimpleFor(m => m.taxation_type_id)
+            .Label(l => l.Text("გადასახადის ტიპი"))
+            .Editor(ed => ed.SelectBox()
+            .SearchEnabled(true)
+            .DataSource(ds => ds.Mvc()
+            .Controller("Products")
+            .LoadAction("TaxationTypes")
+            .Key("id"))
+            .ValueExpr("id").DisplayExpr("name"));
+
+            items.AddSimpleFor(m => m.type_id)
+            .Label(l => l.Text("პროდუქტის ტიპი"))
+            .Editor(ed => ed.SelectBox()
+            .SearchEnabled(true)
+            .DataSource(ds => ds.Mvc()
+            .Controller("Products")
+            .LoadAction("ProductTypes")
+             .Key("id"))
+            .ValueExpr("id").DisplayExpr("name"));
+
+            items.AddSimpleFor(m => m.measure_unit_id)
+            .Label(l => l.Text("ერთეული"))
+            .Editor(ed => ed.SelectBox()
+            .SearchEnabled(true)
+            .DataSource(ds => ds.Mvc()
+            .Controller("Products")
+            .LoadAction("MeasureUnits")
+            .Key("id"))
+            .ValueExpr("id").DisplayExpr("name"));
+
+            items.AddSimpleFor(m => m.category_id)
+            .Label(l => l.Text("კატეგორია"))
+            .Editor(ed => ed.SelectBox()
+            .SearchEnabled(true)
+            .DataSource(ds => ds.Mvc()
+            .Controller("Products")
+            .LoadAction("ProductCategories")
+            .Key("id"))
+            .ValueExpr("id").DisplayExpr("type"));
+            
         })
+        )
+        )
 
         // Columns
         .Columns(columns =>
@@ -50,22 +119,62 @@
 
             columns.AddFor(m => m.code)
             .Caption("კოდი")
-            .Width(140);
+            .Width(100);
 
             columns.AddFor(m => m.barcode)
             .Caption("შტრიხკოდი")
-            .Width(160);
+            .Width(100);
 
             columns.AddFor(m => m.price)
             .Caption("ფასი")
             .DataType(GridColumnDataType.Number)
             .Format(f => f.Type(Format.FixedPoint).Precision(2))
-            .EditorOptions(new { min = 0 });
+            .EditorOptions(new { min = 0 })
+            .Width(100);
 
             columns.AddFor(m => m.sale_percent)
             .Caption("ფასდაკლება")
             .DataType(GridColumnDataType.Number)
-            .CustomizeText("function(e){ return (e.value ?? 0) + '%'; }");
+            .CustomizeText("function(e){ return (e.value ?? 0) + '%'; }")
+            .Width(100);
+
+            columns.AddFor(m => m.taxation_type_id)
+            .Caption("გადასახადის ტიპი")
+            .ShowInColumnChooser(false)
+            .Lookup(l => l.DataSource(ds => ds.Mvc()
+            .Controller("Products")
+            .LoadAction("TaxationTypes"))
+            .ValueExpr("id")
+            .DisplayExpr("name"));
+
+            columns.AddFor(m => m.type_id)
+            .Caption("პროდუქტის ტიპი")
+            .Visible(false)
+            .ShowInColumnChooser(false)
+            .Lookup(l => l.DataSource(ds => ds.Mvc()
+            .Controller("Products")
+            .LoadAction("ProductTypes"))
+            .ValueExpr("id")
+            .DisplayExpr("name"));
+
+            columns.AddFor(m => m.measure_unit_id)
+            .Caption("ერთეული")
+            .Visible(false)
+            .ShowInColumnChooser(false)
+            .Lookup(l => l.DataSource(ds => ds.Mvc()
+            .Controller("Products")
+            .LoadAction("MeasureUnits"))
+            .ValueExpr("id")
+            .DisplayExpr("name"));
+
+            columns.AddFor(m => m.category_id)
+            .Caption("კატეგორია")
+            .ShowInColumnChooser(false)
+            .Lookup(l => l.DataSource(ds => ds.Mvc()
+            .Controller("Products")
+            .LoadAction("ProductCategories"))
+            .ValueExpr("id")
+            .DisplayExpr("type"));
 
         })
 
@@ -102,7 +211,20 @@
 
         // Custom toolbar buttons
         .OnToolbarPreparing("products_onToolbarPreparing")
+        //on new row
+        .OnInitNewRow("products_onInitNewRow")
+        )
 
+
+    @(Html.DevExtreme().FileUploader()
+        .ID("excelUploader")
+        .SelectButtonText("Excel იმპორტი")
+        .LabelText("")
+        .Multiple(false)
+        .Accept(".xlsx,.xls,.csv")
+        .UploadMode(FileUploadMode.Instantly)
+        .UploadUrl(Url.Action("UploadExcel", "Products"))
+        .OnUploaded("() => $('#productsGrid').dxDataGrid('instance').refresh()")
         )
 </div>
 
@@ -135,5 +257,19 @@
                 }
             });
         }
+    function products_onInitNewRow(e) {
+        // set whatever defaults you want
+        e.data = e.data || {};
+
+
+        e.data.price = 0;
+        e.data.sale_percent = 0;
+
+        // Lookups: set IDs that actually exist in the lookup data
+        e.data.taxation_type_id = 1;      // e.g., "VAT" id
+        e.data.type_id = 1;      // e.g., "Standard" id
+        e.data.measure_unit_id = 1;      // e.g., "pcs" id
+        e.data.category_id = null;   // or a default category id
+    }
     </script>
 

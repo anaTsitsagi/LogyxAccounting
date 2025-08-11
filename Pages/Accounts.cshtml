@@ -1,74 +1,78 @@
-﻿@page
-@using LogyxAccounting.Models
+﻿@page "/Accounts"
+@using DevExtreme.AspNet.Mvc
 @using LogyxAccounting.Models.Repository
 
+@await Component.InvokeAsync("DirectoriesMenu", new { activeKey = "accounts" })
 
-<div class="widget-container">
-    @await Component.InvokeAsync("DirectoriesMenu", new { activeKey = "accounts" })
+@(Html.DevExtreme().TreeList<AccountsRepository>()                // your DTO/entity
+    .ID("accountsTree")
+    .ElementAttr("class", "tree-indent-lg")
+    .DataSource(ds => ds.Mvc()
+        .Controller("Accounts")                           // -> AccountsController below
+        .LoadAction("Get")
+        .InsertAction("Post")
+        .UpdateAction("Put")
+        .DeleteAction("Delete")
+        .Key("code")                                      // unique key
+    )
+    .KeyExpr("code")                                      // key field
+    .ParentIdExpr("parent_code")                          // parent pointer
+    .DataStructure(TreeListDataStructure.Plain)           // flat data with parent ids
+    .RootValue(0)
 
-    @(Html.DevExtreme().DataGrid<AccountsRepository>()
-        .ElementAttr(new { @class = "dx-card wide-card" })
-        .DataSource(d => d.Mvc().Controller("Accounts").LoadAction("Get").Key("id"))
-        .ShowBorders(false)
-        .FilterRow(f => f.Visible(true))
-        .FocusedRowEnabled(true)
-        .FocusedRowIndex(0)
-        .ColumnAutoWidth(true)
-        .Columns(columns =>
-        {
-            columns.AddFor(m => m.code);
-            columns.AddFor(m => m.name);
-        })
-        .Paging(p => p.PageSize(10))
-        .Pager(p => p
-        .ShowPageSizeSelector(true)
-        .AllowedPageSizes(new[] { 5, 10, 20 })
-        .ShowInfo(true)
+    .AutoExpandAll(false)
+    .ColumnAutoWidth(true)
+    .WordWrapEnabled(true)
+    .ShowBorders(false)
+    .FocusedRowEnabled(true)
+
+    /* Search & filtering */
+    .SearchPanel(s => s.Visible(true).Placeholder("ძიება..."))
+    .FilterRow(f => f.Visible(true).ApplyFilter(GridApplyFilterMode.Auto))
+    .HeaderFilter(h => h.Visible(false))
+
+    /* Editing (Form mode; Row mode also works) */
+    .Editing(e => e
+        .Mode(GridEditMode.Form)                      // or TreeListEditMode.Row
+        .AllowAdding(true)
+        .AllowUpdating(true)
+        .AllowDeleting(true)
+        .UseIcons(true)
+        .Form(f => f.ColCountByScreen(c => c.Lg(3).Md(2).Sm(1))
+            .Items(items =>
+            {
+                items.AddSimpleFor(m => m.code)
+                     .IsRequired(true)
+                     .ValidationRules(v => v.AddRequired());
+
+                items.AddSimpleFor(m => m.name)
+                     .IsRequired(true)
+                     .ValidationRules(v => v.AddRequired());
+
+                // let users change parent (optional)
+                items.AddSimpleFor(m => m.parent_code)
+                     .Label(l => l.Text("Parent code"));
+            })
         )
-        )
-</div>
+    )
 
-<script>
-    function orientation_valueChanged(e) {
-        const $widgetWrapper = $(".widget-wrapper");
+    .Columns(c =>
+    {
+        c.AddFor(m => m.code).Caption("Code").Width(120);
+        c.AddFor(m => m.name).Caption("Name");
+        c.AddFor(m => m.parent_code).Caption("Parent code").Visible(true); // hide if you prefer
+        
+    })
 
-        const isVertical = e.value === "vertical";
+    // Nice: prefill parent_code when user adds under a focused node
+    .OnInitNewRow("acct_onInitNewRow")
+)
 
-        $widgetWrapper.toggleClass("widget-wrapper-vertical", isVertical);
-        $widgetWrapper.toggleClass("widget-wrapper-horizontal", !isVertical);
+    <script>
+        function acct_onInitNewRow(e) {
+            const tree = $("#accountsTree").dxTreeList("instance");
+            const parentKey = tree.option("focusedRowKey");   // null when adding at root
+            if (parentKey != null) e.data.parent_code = parentKey;
+        }
+    </script>
 
-        setTabsOption("orientation", e.value);
-    }
-
-    function stylingMode_valueChanged(e) {
-        setTabsOption("stylingMode", e.value);
-    }
-
-    function iconPosition_valueChanged(e) {
-        setTabsOption("iconPosition", e.value);
-    }
-
-    function showNavigation_valueChanged(e) {
-        const scrollContentCheckBox = $("#scroll-content").dxCheckBox("instance");
-        const shouldRestrictWidth = data.value || scrollContentCheckBox.option("value");
-
-        toggleStrictWidthClass(shouldRestrictWidth);
-
-        setTabsOption("showNavButtons", e.value);
-    }
-
-    function scrollContent_valueChanged(e) {
-        const showNavButtonsCheckBox = $("#show-navigation-buttons").dxCheckBox("instance");
-        const shouldRestrictWidth = data.value || showNavButtonsCheckBox.option("value");
-
-        toggleStrictWidthClass(shouldRestrictWidth);
-
-        setTabsOption("scrollByContent", e.value);
-    }
-
-    function toggleStrictWidthClass(shouldRestrictWidth) {
-        const $widgetWrapper = $(".widget-wrapper");
-
-        $widgetWrapper.toggleClass("strict-width", isHorizontal && shouldRestrictWidth);
-    }
-</script>

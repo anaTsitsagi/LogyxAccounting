@@ -21,9 +21,11 @@
                 foreach (var it in items)
                 {
                     var isSelected = string.Equals(it.Key, activeKey, System.StringComparison.OrdinalIgnoreCase);
-
+                    string href = !string.IsNullOrEmpty(it.Url)
+                        ? it.Url
+                        : Url.Action(it.Action ?? "Index", (string)it.Controller);
                     m.Add().Text(it.Text)
-                         .Url(Url.Action(it.Action, it.Controller))
+                         .Url(href)
                          .Option("key", it.Key)
                          .Option("selected", isSelected);   // <- mark the active item
                 }
@@ -31,3 +33,14 @@
         ).Location(ToolbarItemLocation.After);
     })
 )
+
+<script>
+(function () {
+  var activeKey = "@activeKey";
+  var menu = $("#topMenu").dxMenu("instance");
+  if (!menu) return;
+  var data = menu.option("items") || [];
+  var selected = data.find(function (x) { return x.key === activeKey; });
+  if (selected) menu.option("selectedItem", selected);
+})();
+</script>

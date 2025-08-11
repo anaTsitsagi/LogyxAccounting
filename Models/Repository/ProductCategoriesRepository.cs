@@ -1,6 +1,6 @@
 ﻿namespace LogyxAccounting.Models.Repository
 {
-    public class AccountsRepository
+    public class ProductCategoriesRepository
     {
         public int id { get; set; }
 
@@ -8,6 +8,6 @@
 
         public int parent_code { get; set; }
 
-        public string name { get; set; }
+        public string type { get; set; }
     }
 }
