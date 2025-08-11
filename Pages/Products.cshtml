@@ -7,47 +7,48 @@
     @* Reusable top menu inside page content *@
     @await Component.InvokeAsync("DirectoriesMenu", new { activeKey = "products" })
 
-    @(Html.DevExtreme().DataGrid<ProductsRepository>()
-        .ID("productsGrid")
-        .ElementAttr(new { @class = "dx-card wide-card custom-grid grid-card" })
+    @(
+        Html.DevExtreme().DataGrid<ProductsRepository>()
+            .ID("productsGrid")
+            .ElementAttr(new { @class = "dx-card wide-card custom-grid grid-card" })
 
-        // Data
-        .DataSource(d => d.Mvc()
-        .Controller("Products")
-        .LoadAction("Get")
-        .InsertAction("Post")
-        .UpdateAction("Put")
-        .DeleteAction("Delete")
-        .Key("id")
-        )
+            // Data
+            .DataSource(d => d.Mvc()
+            .Controller("Products")
+            .LoadAction("Get")
+            .InsertAction("Post")
+            .UpdateAction("Put")
+            .DeleteAction("Delete")
+            .Key("id")
+            )
 
-        // Look & feel
-        .ShowBorders(false)
-        .RowAlternationEnabled(true)
-        .HoverStateEnabled(true)
-        .ColumnAutoWidth(true)
-        .AllowColumnReordering(true)
-        .AllowColumnResizing(true)
-        .ColumnResizingMode(ColumnResizingMode.NextColumn)
-        .WordWrapEnabled(true)
+            // Look & feel
+            .ShowBorders(false)
+            .RowAlternationEnabled(true)
+            .HoverStateEnabled(true)
+            .ColumnAutoWidth(true)
+            .AllowColumnReordering(true)
+            .AllowColumnResizing(true)
+            .ColumnResizingMode(ColumnResizingMode.NextColumn)
+            .WordWrapEnabled(true)
 
-        // Find & filter
-        .SearchPanel(s => s.Visible(true).Placeholder("ძებნა..."))
-        .FilterRow(f => f.Visible(true).ApplyFilter(GridApplyFilterMode.Auto))
-        .HeaderFilter(h => h.Visible(false))
+            // Find & filter
+            .SearchPanel(s => s.Visible(true).Placeholder("ძებნა..."))
+            .FilterRow(f => f.Visible(true).ApplyFilter(GridApplyFilterMode.Auto))
+            .HeaderFilter(h => h.Visible(false))
 
-        //editing
-        .Editing(e => e
-        .Mode(GridEditMode.Form)
-        .AllowAdding(true)
-        .AllowUpdating(true)
-        .AllowDeleting(true)
-        .UseIcons(true)
-        .Form(f => f
-        .ColCount(2)
-        .LabelLocation(FormLabelLocation.Top)
-        .Items(items =>
-        {
+            //editing
+            .Editing(e => e
+            .Mode(GridEditMode.Form)
+            .AllowAdding(true)
+            .AllowUpdating(true)
+            .AllowDeleting(true)
+            .UseIcons(true)
+            .Form(f => f
+            .ColCount(2)
+            .LabelLocation(FormLabelLocation.Top)
+            .Items(items =>
+            {
 
             items.AddSimpleFor(m => m.name)
             .IsRequired(true)
@@ -63,7 +64,7 @@
             .Min(0)
             .Format(fm => fm.Type(Format.FixedPoint).Precision(2)));
 
-                // DB stores 20 for 20% → keep 0..100 editor
+            // DB stores 20 for 20% → keep 0..100 editor
             items.AddSimpleFor(m => m.sale_percent);
 
             items.AddSimpleFor(m => m.taxation_type_id)
@@ -105,7 +106,57 @@
             .LoadAction("ProductCategories")
             .Key("id"))
             .ValueExpr("id").DisplayExpr("type"));
-            
+
+            items.AddSimpleFor(m => m.inventory_account_id)
+            .Label(l => l.Text("მარაგების აღრიცხვის ანგარიში"))
+            .Editor(ed => ed.SelectBox()
+            .SearchEnabled(true)
+            .DataSource(ds => ds.Mvc()
+            .Controller("Products")
+            .LoadAction("Accounts")
+            .Key("id"))
+            .ValueExpr("id")
+            .DisplayExpr(new JS("item => item ? `${item.code} — ${item.name}` : ''"))
+            .SearchExpr(new[] { "code", "name" }));
+
+            items.AddSimpleFor(m => m.income_account_id)
+            .Label(l => l.Text("შემოსავლების აღრიცხვის ანგარიში"))
+            .Editor(ed => ed.SelectBox()
+            .SearchEnabled(true)
+            .DataSource(ds => ds.Mvc()
+            .Controller("Products")
+            .LoadAction("Accounts")
+            .Key("id"))
+            .ValueExpr("id")
+            .DisplayExpr(new JS("item => item ? `${item.code} — ${item.name}` : ''"))
+            .SearchExpr(new[] { "code", "name" }));
+
+            items.AddSimpleFor(m => m.expenses_account_id)
+            .Label(l => l.Text("ხარჯების აღრიცხვის ანგარიში"))
+            .Editor(ed => ed.SelectBox()
+            .SearchEnabled(true)
+            .DataSource(ds => ds.Mvc()
+            .Controller("Products")
+            .LoadAction("Accounts")
+            .Key("id"))
+            .ValueExpr("id")
+            .DisplayExpr(new JS("item => item ? `${item.code} — ${item.name}` : ''"))
+            .SearchExpr(new[] { "code", "name" }));
+
+            items.AddSimpleFor(m => m.accrued_taxes_account_id)
+            .Label(l => l.Text("დარიცხული დღგ-ის ანგარიში"))
+            .Editor(ed => ed.SelectBox()
+            .SearchEnabled(true)
+            .DataSource(ds => ds.Mvc()
+            .Controller("Products")
+            .LoadAction("Accounts")
+            .Key("id"))
+            .ValueExpr("id")
+            .DisplayExpr(new JS("item => item ? `${item.code} — ${item.name}` : ''"))
+            .SearchExpr(new[] { "code", "name" }));
+
+            items.AddSimpleFor(m => m.comment);
+
         })
         )
         )
@@ -175,6 +226,55 @@
             .LoadAction("ProductCategories"))
             .ValueExpr("id")
             .DisplayExpr("type"));
+
+
+            columns.AddFor(m => m.inventory_account_id)
+            .Caption("მარაგების აღრიცხვის ანგარიში")
+            .ShowInColumnChooser(false)
+            .Visible(false)
+            .Lookup(l => l.DataSource(ds => ds.Mvc()
+            .Controller("Products")
+            .LoadAction("Accounts"))
+            .ValueExpr("id")
+            .DisplayExpr(new JS("item => item ? `${item.code} — ${item.name}` : ''")));
+
+
+            columns.AddFor(m => m.income_account_id)
+            .Caption("შემოსავლების აღრიცხვის ანგარიში")
+            .ShowInColumnChooser(false)
+            .Visible(false)
+            .Lookup(l => l.DataSource(ds => ds.Mvc()
+            .Controller("Products")
+            .LoadAction("Accounts"))
+            .ValueExpr("id")
+            .DisplayExpr(new JS("item => item ? `${item.code} — ${item.name}` : ''")));
+
+
+            columns.AddFor(m => m.expenses_account_id)
+            .Caption("ხარჯების აღრიცხვის ანგარიში")
+            .ShowInColumnChooser(false)
+            .Visible(false)
+            .Lookup(l => l.DataSource(ds => ds.Mvc()
+            .Controller("Products")
+            .LoadAction("Accounts"))
+            .ValueExpr("id")
+            .DisplayExpr(new JS("item => item ? `${item.code} — ${item.name}` : ''")));
+
+
+            columns.AddFor(m => m.accrued_taxes_account_id)
+            .Caption("დარიცხული დღგ-ის ანგარიში")
+            .ShowInColumnChooser(false)
+            .Visible(false)
+            .Lookup(l => l.DataSource(ds => ds.Mvc()
+            .Controller("Products")
+            .LoadAction("Accounts"))
+            .ValueExpr("id")
+            .DisplayExpr(new JS("item => item ? `${item.code} — ${item.name}` : ''")));
+
+            columns.AddFor(m => m.comment)
+            .Caption("კომენტარი")
+            .Visible(false)
+            .DataType(GridColumnDataType.String);
 
         })
 
@@ -269,7 +369,8 @@
         e.data.taxation_type_id = 1;      // e.g., "VAT" id
         e.data.type_id = 1;      // e.g., "Standard" id
         e.data.measure_unit_id = 1;      // e.g., "pcs" id
-        e.data.category_id = null;   // or a default category id
+        e.data.category_id = null; 
+        e.data.inventory_account_id = 1610;// or a default category id
     }
     </script>
 

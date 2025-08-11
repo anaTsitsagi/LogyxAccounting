@@ -81,5 +81,10 @@ public class ProductsController : Controller
         => DataSourceLoader.Load(_context.ProductCategories
                 .Select(x => new { id = x.id, name = x.type }), loadOptions);
 
+    [HttpGet]
+    public object Accounts(DataSourceLoadOptions loadOptions)
+        => DataSourceLoader.Load(_context.Accounts
+                .Select(x => new { id = x.id,code = x.code, name = x.name }), loadOptions);
+
 
 }
