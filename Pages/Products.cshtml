@@ -35,7 +35,7 @@
             // Find & filter
             .SearchPanel(s => s.Visible(true).Placeholder("ძებნა..."))
             .FilterRow(f => f.Visible(true).ApplyFilter(GridApplyFilterMode.Auto))
-            .HeaderFilter(h => h.Visible(false))
+            .HeaderFilter(h => h.Visible(true))
 
             //editing
             .Editing(e => e
@@ -98,7 +98,7 @@
             .ValueExpr("id").DisplayExpr("name"));
 
             items.AddSimpleFor(m => m.category_id)
-            .Label(l => l.Text("კატეგორია"))
+            .Label(l => l.Text("ჯგუფი"))
             .Editor(ed => ed.SelectBox()
             .SearchEnabled(true)
             .DataSource(ds => ds.Mvc()
@@ -144,7 +144,7 @@
             .SearchExpr(new[] { "code", "name" }));
 
             items.AddSimpleFor(m => m.accrued_taxes_account_id)
-            .Label(l => l.Text("დარიცხული დღგ-ის ანგარიში"))
+            .Label(l => l.Text("დღგ-ის ანგარიში"))
             .Editor(ed => ed.SelectBox()
             .SearchEnabled(true)
             .DataSource(ds => ds.Mvc()
@@ -191,7 +191,7 @@
 
             columns.AddFor(m => m.taxation_type_id)
             .Caption("გადასახადის ტიპი")
-            .ShowInColumnChooser(false)
+            .ShowInColumnChooser(true)
             .Lookup(l => l.DataSource(ds => ds.Mvc()
             .Controller("Products")
             .LoadAction("TaxationTypes"))
@@ -201,7 +201,7 @@
             columns.AddFor(m => m.type_id)
             .Caption("პროდუქტის ტიპი")
             .Visible(false)
-            .ShowInColumnChooser(false)
+            .ShowInColumnChooser(true)
             .Lookup(l => l.DataSource(ds => ds.Mvc()
             .Controller("Products")
             .LoadAction("ProductTypes"))
@@ -210,8 +210,7 @@
 
             columns.AddFor(m => m.measure_unit_id)
             .Caption("ერთეული")
-            .Visible(false)
-            .ShowInColumnChooser(false)
+            .ShowInColumnChooser(true)
             .Lookup(l => l.DataSource(ds => ds.Mvc()
             .Controller("Products")
             .LoadAction("MeasureUnits"))
@@ -219,8 +218,8 @@
             .DisplayExpr("name"));
 
             columns.AddFor(m => m.category_id)
-            .Caption("კატეგორია")
-            .ShowInColumnChooser(false)
+            .Caption("ჯგუფი")
+            .ShowInColumnChooser(true)
             .Lookup(l => l.DataSource(ds => ds.Mvc()
             .Controller("Products")
             .LoadAction("ProductCategories"))
@@ -230,7 +229,7 @@
 
             columns.AddFor(m => m.inventory_account_id)
             .Caption("მარაგების აღრიცხვის ანგარიში")
-            .ShowInColumnChooser(false)
+            .ShowInColumnChooser(true)
             .Visible(false)
             .Lookup(l => l.DataSource(ds => ds.Mvc()
             .Controller("Products")
@@ -241,7 +240,7 @@
 
             columns.AddFor(m => m.income_account_id)
             .Caption("შემოსავლების აღრიცხვის ანგარიში")
-            .ShowInColumnChooser(false)
+            .ShowInColumnChooser(true)
             .Visible(false)
             .Lookup(l => l.DataSource(ds => ds.Mvc()
             .Controller("Products")
@@ -252,7 +251,7 @@
 
             columns.AddFor(m => m.expenses_account_id)
             .Caption("ხარჯების აღრიცხვის ანგარიში")
-            .ShowInColumnChooser(false)
+            .ShowInColumnChooser(true)
             .Visible(false)
             .Lookup(l => l.DataSource(ds => ds.Mvc()
             .Controller("Products")
@@ -262,8 +261,8 @@
 
 
             columns.AddFor(m => m.accrued_taxes_account_id)
-            .Caption("დარიცხული დღგ-ის ანგარიში")
-            .ShowInColumnChooser(false)
+            .Caption("დღგ-ის ანგარიში")
+            .ShowInColumnChooser(true)
             .Visible(false)
             .Lookup(l => l.DataSource(ds => ds.Mvc()
             .Controller("Products")
@@ -284,18 +283,6 @@
 
         // Column chooser
         .ColumnChooser(cc => cc.Enabled(true).Mode(GridColumnChooserMode.Select))
-
-        // Totals
-        .Summary(s => s.TotalItems(t =>
-        {
-            t.Add().SummaryType(SummaryType.Count)
-            .DisplayFormat("ჩანაწერები: {0}");
-
-            t.Add().Column("price")
-            .SummaryType(SummaryType.Sum)
-            .ValueFormat(v => v.Type(Format.FixedPoint).Precision(2))
-            .DisplayFormat("ჯამი: {0}");
-        }))
 
         // Paging
         .Paging(p => p.PageSize(10))
@@ -360,15 +347,11 @@
     function products_onInitNewRow(e) {
         // set whatever defaults you want
         e.data = e.data || {};
-
-
         e.data.price = 0;
         e.data.sale_percent = 0;
-
         // Lookups: set IDs that actually exist in the lookup data
         e.data.taxation_type_id = 1;      // e.g., "VAT" id
         e.data.type_id = 1;      // e.g., "Standard" id
-        e.data.measure_unit_id = 1;      // e.g., "pcs" id
         e.data.category_id = null; 
         e.data.inventory_account_id = 1610;// or a default category id
     }
