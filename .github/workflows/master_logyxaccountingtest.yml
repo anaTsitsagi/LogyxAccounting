@@ -15,9 +15,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # faster; switch back to windows-latest if you need Windows-specific tooling
-    permissions:
-      contents: read
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,10 +23,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.x  # installs latest 8 SDK
-      # If you use private NuGet feeds, uncomment and configure:
-      # - name: Authenticate private NuGet feeds
-      #   run: dotnet nuget add source "https://YOUR_FEED_URL" --name PrivateFeed --username USER --password "${{ secrets.NUGET_FEED_TOKEN }}" --store-password-in-clear-text
+          dotnet-version: 8.x
 
       - name: Configure NuGet sources (nuget.org + DevExpress)
         run: |
@@ -37,65 +32,44 @@ jobs:
           dotnet nuget add source https://api.nuget.org/v3/index.json -n nuget.org || true
           dotnet nuget add source "${{ secrets.DEVEXPRESS_NUGET_URL }}" -n DevExpress --store-password-in-clear-text || true
           dotnet nuget list source
-          
-      - name: Write temporary NuGet.config (nuget.org + DevExpress)
-        run: |
-          cat > ./nuget.temp.config << 'EOF'
-          <?xml version="1.0" encoding="utf-8"?>
-          <configuration>
-            <packageSources>
-              <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
-              <add key="DevExpress" value="${{ secrets.DEVEXPRESS_NUGET_URL }}" />
-            </packageSources>
-          </configuration>
-          EOF
-          echo "Using:"
-          cat ./nuget.temp.config
 
       - name: Restore
-        run: dotnet restore ./LogyxAccounting.sln --configfile ./nuget.temp.config --nologo -v minimal
+        run: dotnet restore ./LogyxAccounting.sln --nologo -v minimal
 
       - name: Build
         run: dotnet build ./LogyxAccounting.sln -c Release --no-restore -v minimal
 
-      # If you have client assets (npm), add before publish:
-      # - name: Build client assets
-      #   run: |
-      #     npm ci
-      #     npm run build
-
       - name: Publish
-        run: dotnet publish ./LogyxAccounting.csproj -c Release -o ${{ github.workspace }}/publish --no-build \
-         -p:DebugType=None -p:DebugSymbols=false -p:UseAppHost=false
+        run: |
+          dotnet publish ./LogyxAccounting.csproj -c Release --no-build \
+            -o "${{ github.workspace }}/publish" \
+            -p:DebugType=None -p:DebugSymbols=false -p:UseAppHost=false
 
       - name: Create deployment ZIP
         run: |
           cd "${{ github.workspace }}/publish"
           zip -r ../app.zip .
-    
-      - name: Upload artifact
+
+      - name: Upload package artifact (app.zip)
         uses: actions/upload-artifact@v4
         with:
-          name: drop
-          path: ${{ github.workspace }}/publish
+          name: package
+          path: ${{ github.workspace }}/app.zip
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Download artifact
+      - name: Download package artifact
         uses: actions/download-artifact@v4
         with:
-          name: drop
-          path: ./drop
+          name: package
+          path: ./package
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: LogyxAccountingTest
           slot-name: Production
-          package: ${{ github.workspace }}/app.zip
+          package: ./package/app.zip
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_F2D24315337E4A2C87D826867DC61066 }}
-
-
-
