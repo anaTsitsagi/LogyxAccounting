@@ -30,6 +30,14 @@ jobs:
       # - name: Authenticate private NuGet feeds
       #   run: dotnet nuget add source "https://YOUR_FEED_URL" --name PrivateFeed --username USER --password "${{ secrets.NUGET_FEED_TOKEN }}" --store-password-in-clear-text
 
+      - name: Configure NuGet sources (nuget.org + DevExpress)
+        run: |
+          dotnet nuget remove source "DevExpress 25.1 Local" || true
+          dotnet nuget remove source "DevExpressLocal" || true
+          dotnet nuget add source https://api.nuget.org/v3/index.json -n nuget.org || true
+          dotnet nuget add source "${{ secrets.DEVEXPRESS_NUGET_URL }}" -n DevExpress --store-password-in-clear-text || true
+          dotnet nuget list source
+          
       - name: Restore
         run: dotnet restore ./LogyxAccounting.sln --nologo -v minimal
 
@@ -68,3 +76,4 @@ jobs:
           slot-name: Production
           package: ./drop
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_F2D24315337E4A2C87D826867DC61066 }}
+
