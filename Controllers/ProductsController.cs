@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using LogyxAccounting.Data;
 using LogyxAccounting.Models;
 using LogyxAccounting.Models.Repository;
+using Microsoft.EntityFrameworkCore;
 
 [Route("[controller]/[action]")]  
 public class ProductsController : Controller
@@ -84,7 +85,35 @@ public class ProductsController : Controller
     [HttpGet]
     public object InventoryAccounts(DataSourceLoadOptions loadOptions)
         => DataSourceLoader.Load(_context.Accounts
-                .Select(x => new { id = x.id,code = x.code, name = x.name }), loadOptions);
+                .Select(x => new { id = x.id,code = x.code, name = x.name })
+                .Where(x=> EF.Functions.Like(x.code.ToString(), "16%")
+                || EF.Functions.Like(x.code.ToString(), "19%")), 
+                loadOptions);
+
+    [HttpGet]
+    public object IncomeAccounts(DataSourceLoadOptions loadOptions)
+    => DataSourceLoader.Load(_context.Accounts
+            .Select(x => new { id = x.id, code = x.code, name = x.name })
+            .Where(x => EF.Functions.Like(x.code.ToString(), "6%")
+            || EF.Functions.Like(x.code.ToString(), "81%")),
+            loadOptions);
+
+
+    [HttpGet]
+    public object ExpensesAccounts(DataSourceLoadOptions loadOptions)
+    => DataSourceLoader.Load(_context.Accounts
+            .Select(x => new { id = x.id, code = x.code, name = x.name })
+            .Where(x => EF.Functions.Like(x.code.ToString(), "7%")
+            || EF.Functions.Like(x.code.ToString(), "82%")),
+            loadOptions);
+
+    [HttpGet]
+    public object AccruedTaxesAccounts(DataSourceLoadOptions loadOptions)
+    => DataSourceLoader.Load(_context.Accounts
+        .Select(x => new { id = x.id, code = x.code, name = x.name })
+        .Where(x => x.code== 3330 || x.code==3340),
+        loadOptions);
+
 
 
 

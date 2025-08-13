@@ -113,7 +113,7 @@
             .SearchEnabled(true)
             .DataSource(ds => ds.Mvc()
             .Controller("Products")
-            .LoadAction("Accounts")
+            .LoadAction("InventoryAccounts")
             .Key("id"))
             .ValueExpr("id")
             .DisplayExpr(new JS("item => item ? `${item.code} — ${item.name}` : ''"))
@@ -125,7 +125,7 @@
             .SearchEnabled(true)
             .DataSource(ds => ds.Mvc()
             .Controller("Products")
-            .LoadAction("Accounts")
+            .LoadAction("IncomeAccounts")
             .Key("id"))
             .ValueExpr("id")
             .DisplayExpr(new JS("item => item ? `${item.code} — ${item.name}` : ''"))
@@ -137,7 +137,7 @@
             .SearchEnabled(true)
             .DataSource(ds => ds.Mvc()
             .Controller("Products")
-            .LoadAction("Accounts")
+            .LoadAction("ExpensesAccounts")
             .Key("id"))
             .ValueExpr("id")
             .DisplayExpr(new JS("item => item ? `${item.code} — ${item.name}` : ''"))
@@ -149,7 +149,7 @@
             .SearchEnabled(true)
             .DataSource(ds => ds.Mvc()
             .Controller("Products")
-            .LoadAction("Accounts")
+            .LoadAction("AccruedTaxesAccounts")
             .Key("id"))
             .ValueExpr("id")
             .DisplayExpr(new JS("item => item ? `${item.code} — ${item.name}` : ''"))
@@ -233,7 +233,7 @@
             .Visible(false)
             .Lookup(l => l.DataSource(ds => ds.Mvc()
             .Controller("Products")
-            .LoadAction("Accounts"))
+            .LoadAction("InventoryAccounts"))
             .ValueExpr("id")
             .DisplayExpr(new JS("item => item ? `${item.code} — ${item.name}` : ''")));
 
@@ -244,7 +244,7 @@
             .Visible(false)
             .Lookup(l => l.DataSource(ds => ds.Mvc()
             .Controller("Products")
-            .LoadAction("Accounts"))
+            .LoadAction("IncomeAccounts"))
             .ValueExpr("id")
             .DisplayExpr(new JS("item => item ? `${item.code} — ${item.name}` : ''")));
 
@@ -255,7 +255,7 @@
             .Visible(false)
             .Lookup(l => l.DataSource(ds => ds.Mvc()
             .Controller("Products")
-            .LoadAction("Accounts"))
+            .LoadAction("ExpensesAccounts"))
             .ValueExpr("id")
             .DisplayExpr(new JS("item => item ? `${item.code} — ${item.name}` : ''")));
 
@@ -266,7 +266,7 @@
             .Visible(false)
             .Lookup(l => l.DataSource(ds => ds.Mvc()
             .Controller("Products")
-            .LoadAction("Accounts"))
+            .LoadAction("AccruedTaxesAccounts"))
             .ValueExpr("id")
             .DisplayExpr(new JS("item => item ? `${item.code} — ${item.name}` : ''")));
 
