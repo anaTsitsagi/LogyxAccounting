@@ -38,8 +38,22 @@ jobs:
           dotnet nuget add source "${{ secrets.DEVEXPRESS_NUGET_URL }}" -n DevExpress --store-password-in-clear-text || true
           dotnet nuget list source
           
+      - name: Write temporary NuGet.config (nuget.org + DevExpress)
+        run: |
+          cat > ./nuget.temp.config << 'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <configuration>
+            <packageSources>
+              <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
+              <add key="DevExpress" value="${{ secrets.DEVEXPRESS_NUGET_URL }}" />
+            </packageSources>
+          </configuration>
+          EOF
+          echo "Using:"
+          cat ./nuget.temp.config
+
       - name: Restore
-        run: dotnet restore ./LogyxAccounting.sln --nologo -v minimal
+        run: dotnet restore ./LogyxAccounting.sln --configfile ./nuget.temp.config --nologo -v minimal
 
       - name: Build
         run: dotnet build ./LogyxAccounting.sln -c Release --no-restore -v minimal
@@ -76,4 +90,5 @@ jobs:
           slot-name: Production
           package: ./drop
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_F2D24315337E4A2C87D826867DC61066 }}
+
 
