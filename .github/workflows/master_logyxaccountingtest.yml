@@ -65,8 +65,14 @@ jobs:
       #     npm run build
 
       - name: Publish
-        run: dotnet publish ./LogyxAccounting.csproj -c Release -o ${{ github.workspace }}/publish --no-build
+        run: dotnet publish ./LogyxAccounting.csproj -c Release -o ${{ github.workspace }}/publish --no-build \
+         -p:DebugType=None -p:DebugSymbols=false -p:UseAppHost=false
 
+      - name: Create deployment ZIP
+        run: |
+          cd "${{ github.workspace }}/publish"
+          zip -r ../app.zip .
+    
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -88,7 +94,8 @@ jobs:
         with:
           app-name: LogyxAccountingTest
           slot-name: Production
-          package: ./drop
+          package: ${{ github.workspace }}/app.zip
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_F2D24315337E4A2C87D826867DC61066 }}
+
 
 
